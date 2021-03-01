@@ -1,0 +1,90 @@
+<html xmlns="http://www.w3.org/1999/html">
+<body>
+<section>
+    <h1>Add New Row</h1>
+    <form>
+        <input id = "name" type="text" placeholder="Enter your name"></input>
+        <input id = "date" type="text" placeholder="Enter your birth date"></input>
+        <input type="button" value="Compute Row" onclick="computeRow()">
+        <input type="button" value="Submit" onclick="sendForm()">
+    </form>
+    <div id="compute_result" style="visibility: hidden">
+        <p>
+            <span>Computed Row: </span>
+            <span id="long_name"></span>
+        </p>
+        <p>
+            <span>Entropy and Quantities of IInformation: </span>
+            <span id="entropy"></span>
+        </p>
+    </div>
+</section>
+<section>
+    <h1>Old Rows</h1>
+    <ul id="names">
+        <% for(var i = 0; i < names.length; i++) {%>
+            <li class="name">
+                <span>Name: <%= names[i].name %></span>
+                </br>
+                <span>Entropy: <%= names[i].entropy %></span>
+            </li>
+        <% } %>
+    </ul>
+</section>
+<script>
+    function computeRow() {
+        let name = document.getElementById("name")["value"]
+        let birth_date = document.getElementById("date")["value"]
+        birth_date = birth_date.replace('0',"");
+        let long_name = ""
+        for (let i = 0; i < name.length; i++) {
+            for (let j = 0; j < birth_date[i]; j++) {
+                long_name += name[i];
+            }
+        }
+        let entropy = getEntropy(long_name);
+        document.getElementById("long_name")["textContent"] = long_name;
+        document.getElementById("entropy")["textContent"] = entropy;
+        document.getElementById("compute_result").setAttribute("style", "visibility: visible")
+        console.assert(birth_date.length >= name.length, "Short date")
+    }
+
+    function getEntropy(a) {
+        let d = new Map();
+        for (let i = 0; i < a.length; i++) {
+            if (!d.has(a[i])) {
+                d.set(a[i], 0);
+            }
+            d.set(a[i], d.get(a[i]) + 1);
+        }
+        let entropy = 0;
+        for (let entry of d) {
+            let v = entry[1];
+            let p = v / a.length;
+            entropy -= p * Math.log(p);
+        }
+        return entropy;
+    }
+
+    function sendForm() {
+        fetch('/add_long_name', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: document.getElementById("name")["value"],
+                date: document.getElementById("date")["value"]
+            })
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            let rows_list = document.getElementById("names");
+            let li = document.createElement("li");
+            li.innerHTML = "<span>Name: " + data.name + "</span></br><span>Entropy: " + data.entropy + "</span>";
+            rows_list.appendChild(li);
+        });
+    }
+</script>
+</body>
+</html>
