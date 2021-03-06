@@ -1,6 +1,6 @@
 const express = require('express');
 const fs = require('fs');
-const readlineSync  = require('readline-sync');
+const http = require('http');
 const webSocket = require('ws')
 
 let app = express();
@@ -26,10 +26,6 @@ app.post('/add_long_name', function(request, response){
     }
     let entropy = getEntropy(long_name);
     add_to_db(long_name, entropy)
-    // response.send(JSON.stringify({
-    //     "name": long_name,
-    //     "entropy": entropy
-    // }));
     wss.clients.forEach((client) => {
         if (client.readyState === webSocket.OPEN) {
             client.send(JSON.stringify({
@@ -75,6 +71,6 @@ function read_db() {
     });
     return names;
 }
-
-const wss = new webSocket.Server({ port: 8080 })
-app.listen(3000);
+const httpServer = http.createServer(app );
+const wss = new webSocket.Server({ server: httpServer });
+httpServer.listen(8080);

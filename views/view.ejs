@@ -32,7 +32,7 @@
     </ul>
 </section>
 <script>
-    const url = 'ws://abstracted-oceanic-derby.glitch.me:8080'
+    const url = "wss://abstracted-oceanic-derby.glitch.me"
     const connection = new WebSocket(url)
     connection.onmessage = e => {
         let data = JSON.parse(e.data);
