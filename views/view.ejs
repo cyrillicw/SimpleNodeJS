@@ -32,6 +32,16 @@
     </ul>
 </section>
 <script>
+    const url = 'ws://abstracted-oceanic-derby.glitch.me:8080'
+    const connection = new WebSocket(url)
+    connection.onmessage = e => {
+        let data = JSON.parse(e.data);
+        let rows_list = document.getElementById("names");
+        let li = document.createElement("li");
+        li.innerHTML = "<span>Name: " + data.name + "</span></br><span>Entropy: " + data.entropy + "</span>";
+        rows_list.appendChild(li);
+        console.log(e.data)
+    }
     function computeRow() {
         let name = document.getElementById("name")["value"]
         let birth_date = document.getElementById("date")["value"]
@@ -76,14 +86,7 @@
                 name: document.getElementById("name")["value"],
                 date: document.getElementById("date")["value"]
             })
-        }).then((response) => {
-            return response.json();
-        }).then((data) => {
-            let rows_list = document.getElementById("names");
-            let li = document.createElement("li");
-            li.innerHTML = "<span>Name: " + data.name + "</span></br><span>Entropy: " + data.entropy + "</span>";
-            rows_list.appendChild(li);
-        });
+        })
     }
 </script>
 </body>
